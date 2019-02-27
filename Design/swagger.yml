@@ -1,0 +1,411 @@
+swagger: "2.0"
+info: 
+  version: "1.0.0"
+  title: "Keep App API"
+  description: "This specification is for the Keep App |
+                This has all the informations regarding the API's that are used in the keep app"
+  contact: 
+    name: "Saravana Balaji | Prabin"
+    email: "saravanabalajis49@gmail.com"
+  license:
+    name: "XYZ"
+host: "localhost:3000"
+basePath: "/v1/"
+schemes: 
+  - "http"
+  - "https"
+consumes: 
+  - "application/json"
+produces: 
+  - "application/json"
+  
+tags:
+  - name: notes
+    description: Refer to notes that are created in the app
+    
+  - name: lists
+    description: Refer to lists that are added in a note |
+                 deals.
+  - name: labels
+    description: Refer to labels that marked on the note
+    
+paths:
+  /notes/:
+    get:
+      summary: get all notes created
+      description: returns the notes data that are created
+      tags:
+        - notes
+        - lists
+        - labels
+   
+      responses:
+        "200":
+          description: success
+          schema:
+            $ref: "#/definitions/Notes"
+          
+        "404":
+          description: notes are not retrieved
+          schema:
+            $ref: "#/definitions/NotFoundError"
+          
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/GeneralError"
+            
+    post:
+      summary: create a new note
+      description: creates a new note in the app
+      operationId: "addNote"
+      produces:
+        - application/json
+      parameters: 
+        - 
+          name: "note"
+          in: "body"
+          description: "note to add to the notes"
+          required: true
+          schema: 
+            $ref: "#/definitions/Notes"
+      responses:
+        "200":
+          description: add note
+          schema:
+            $ref: "#/definitions/Notes"
+        default:
+          description: unexpected error
+          schema:
+            $ref: "#/definitions/GeneralError"
+            
+          
+  /notes/{id}:
+    get:
+      summary: get all notes created
+      description: returns the notes data that are created
+      tags:
+        - notes
+        - lists
+        - labels
+      consumes: 
+        - application/json
+      produces: 
+        - application/json
+      parameters:
+        - $ref : "#/parameters/IdInPath"
+      responses:
+        "200":
+          description: success
+          schema:
+            $ref: "#/definitions/Notes"
+          
+        "404":
+          description: notes are not retrieved
+          schema:
+            $ref: "#/definitions/NotFoundError"
+          
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/GeneralError"
+            
+    delete:
+      description: deletes a single note based on the ID supplied
+      operationId: deleteNote
+      parameters:
+        - name: id
+          in: path
+          description: ID of note to delete
+          required: true
+          type: integer
+          format: int64
+      responses:
+        "204":
+          description: note deleted
+          schema:
+            $ref: '#/definitions/Notes'
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/GeneralError'
+            
+            
+  /labels/:
+    get:
+      summary: get all labels created
+      description: returns the labels data that are created
+      tags:
+        - labels
+    
+   
+      responses:
+        "200":
+          description: success
+          schema:
+            $ref: "#/definitions/labels"
+          
+        "404":
+          description: notes are not retrieved
+          schema:
+            $ref: "#/definitions/NotFoundError"
+          
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/GeneralError"
+    
+    post:
+      summary: create a label for note
+      description: creates a new label for the note
+      operationId: "addLabel"
+      produces:
+        - application/json
+      parameters: 
+        - 
+          name: "label"
+          in: "body"
+          description: "lable to add to the note"
+          required: true
+          schema: 
+            $ref: "#/definitions/labels"
+      responses:
+        "200":
+          description: add note
+          schema:
+            $ref: "#/definitions/labels"
+        default:
+          description: unexpected error
+          schema:
+            $ref: "#/definitions/GeneralError"
+            
+  /notes/{id}/labels/: 
+    get:
+      summary: get label based on id
+      description: returns the label data that are matching with id supplied
+      tags:
+        - notes
+        - label
+        
+      parameters:
+        - $ref : "#/parameters/IdInPath"
+   
+      responses:
+        "200":
+          description: success
+          schema:
+            $ref: "#/definitions/labels"
+          
+        "404":
+          description: notes are not retrieved
+          schema:
+            $ref: "#/definitions/NotFoundError"
+          
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/GeneralError"
+            
+            
+    delete:
+      description: deletes a single label based on the ID supplied
+      operationId: deleteLabel
+      parameters:
+        - name: id
+          in: path
+          description: ID of label to delete
+          required: true
+          type: integer
+          format: int64
+      responses:
+        "204":
+          description: label deleted
+          schema:
+            $ref: '#/definitions/labels'
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/GeneralError'
+            
+  /notes/{id}/lists/:
+    get:
+      summary: get all lists created on the note
+      description: returns the lists data that are created on the note supplied with ID
+      tags:
+        - notes
+        - lists
+        
+      consumes: 
+        - application/json
+      produces: 
+        - application/json
+        
+      parameters:
+        - $ref : "#/parameters/IdInPath"
+   
+      responses:
+        "200":
+          description: success
+          schema:
+            $ref: "#/definitions/lists"
+          
+        "404":
+          description: list are not retrieved
+          schema:
+            $ref: "#/definitions/NotFoundError"
+          
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/GeneralError"
+    
+    post:
+      summary: create a list on the note with id supplied
+      description: creates a new label for the note
+      operationId: "addList"
+      produces:
+        - application/json
+      parameters: 
+        - $ref : "#/parameters/IdInPath"
+        - 
+          name: "label"
+          in: "body"
+          description: "lable to add to the note"
+          required: true
+          schema: 
+            $ref: "#/definitions/lists"
+      responses:
+        "200":
+          description: add note
+          schema:
+            $ref: "#/definitions/lists"
+        default:
+          description: unexpected error
+          schema:
+            $ref: "#/definitions/GeneralError"
+            
+    delete:
+      description: deletes a single list based on the ID supplied
+      operationId: deleteList
+      parameters:
+        - name: id
+          in: path
+          description: ID of list to delete
+          required: true
+          type: integer
+          format: int64
+      responses:
+        "204":
+          description: list deleted
+          schema:
+            $ref: '#/definitions/lists'
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/GeneralError'
+           
+            
+            
+         
+    
+definitions:
+# A general message schema in case of an error
+  GeneralError:
+    required:
+      - message
+    properties:
+      message:
+        type: string
+  # A Not found error that is sent back in case no results are found for the 
+  # requested resource
+  NotFoundError:
+    required:
+      - message
+      - hint
+    properties:
+      message:
+        type: string
+      hint:
+        type: string
+        
+  Notes:
+    required:
+      - noteId
+      - noteTitle
+      - isSentence
+      - Users
+      - createdBy
+      - labels
+      - lists
+    properties:
+      nodeId:
+        type: string
+      noteTitle:
+        type: string
+      isSentence:
+        type: boolean
+        enum:
+          - true
+          - false
+      users:
+        type: array
+        items:
+          $ref: "#/definitions/users"
+      createdBy:
+        type: string
+      labels: 
+        type: array
+        items:
+          $ref: "#/definitions/labels"
+      lists:
+        type: array
+        items:
+          $ref: "#/definitions/lists"
+        
+  users:
+    required:
+      - userId
+      - uname
+    properties:
+      userId:
+        type: string
+      uname:
+        type: string
+      
+  labels:
+    required:
+      - labelId
+      - labelName
+    properties:
+      labelId:
+        type: string
+      labelName:
+        type: string
+        
+  lists:
+    required:
+      - listId
+      - listText
+      - isChecked
+    properties:
+      listId:
+        type: string
+      listText:
+        type: string
+      isChecked:
+        type: boolean
+
+parameters:
+  IdInPath:
+      name: id
+      in: path
+      type: string
+      required: true
+  LabelIdInPath:
+      name: id
+      in: path
+      type: string
+      required: true
+        
+        
+    
