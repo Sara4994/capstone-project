@@ -110,6 +110,35 @@ paths:
           schema:
             $ref: "#/definitions/GeneralError"
             
+    put:
+      tags:
+      - notes
+      summary: "Update an existing note"
+      description: ""
+      operationId: "updateNote"
+      consumes:
+      - "application/json"
+      
+      produces:
+      - "application/json"
+      
+      parameters:
+        - $ref : "#/parameters/IdInPath"
+      responses:
+        400:
+          description: Invalid ID supplied
+        404:
+          description: Note not found
+          schema:
+            $ref: "#/definitions/NotFoundError"
+        405:
+          description: "Validation exception"
+        default:
+          description: unexpected errors
+          schema:
+            $ref: "#/definitions/GeneralError"
+          
+            
     delete:
       description: deletes a single note based on the ID supplied
       operationId: deleteNote
@@ -207,6 +236,39 @@ paths:
             $ref: "#/definitions/GeneralError"
             
             
+    put:
+      tags:
+      - notes
+      summary: "Update an existing note"
+      description: ""
+      operationId: "updateLabel"
+      consumes:
+      - "application/json"
+      
+      produces:
+      - "application/json"
+      
+      parameters:
+        - $ref : "#/parameters/IdInPath"
+      responses:
+        "200":
+          description: success
+          schema:
+            $ref: "#/definitions/labels"
+        "400":
+          description: Invalid ID supplied
+        "204":
+          description: Note not found
+          schema:
+            $ref: "#/definitions/NotFoundError"
+        "405":
+          description: "Validation exception"
+        default:
+          description: unexpected errors
+          schema:
+            $ref: "#/definitions/GeneralError"
+            
+            
     delete:
       description: deletes a single label based on the ID supplied
       operationId: deleteLabel
@@ -256,6 +318,38 @@ paths:
           
         default:
           description: Error
+          schema:
+            $ref: "#/definitions/GeneralError"
+            
+    put:
+      tags:
+      - notes
+      summary: "Update an existing list"
+      description: ""
+      operationId: "updateList"
+      consumes:
+      - "application/json"
+      
+      produces:
+      - "application/json"
+      
+      parameters:
+        - $ref : "#/parameters/IdInPath"
+      responses:
+        "200":
+          description: success
+          schema:
+            $ref: "#/definitions/lists"
+        "400":
+          description: Invalid ID supplied
+        "204":
+          description: Note not found
+          schema:
+            $ref: "#/definitions/NotFoundError"
+        "405":
+          description: "Validation exception"
+        default:
+          description: unexpected errors
           schema:
             $ref: "#/definitions/GeneralError"
     
