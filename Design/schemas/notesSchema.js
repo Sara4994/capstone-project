@@ -5,16 +5,21 @@ var notesSchema = new Schema({
     noteId: String,
     noteTitle: String,
     isSentence: Boolean,
-    users: [{userId: String, uname: String}],
-    createdBy: String,
-    labels: [{labelId: String, name: String}],
-    lists: [{listId: String, isChecked: Boolean, listText: String}]
+    lists: [{listId: String, isChecked: Boolean, listText: String}],
+    createAt: {type: Date, default: Date.now()},
+    updatedAt: {type: Date, default: Date.now()},
+    _createdBy: [{type: mongoose.Schema.ObjectId, ref: 'User' }],
+    _labels: [{type: mongoose.Schema.ObjectId, ref: 'Label'}]    
 })
 
 var LabelSchema = new Schema ({
     labelId: String,
-    labelName: String
+    labelName: String,
+    users: [{userId: String, uname: String}],
+    createAt: {type: Date, default: Date.now()},
 })
+
+
 
 var notesModel = mongoose.model('Notes', notesSchema);
 var LabelModel = mongoose.model('Label', LabelSchema);

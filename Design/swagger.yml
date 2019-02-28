@@ -20,31 +20,33 @@ produces:
   - "application/json"
   
 tags:
+  - name: users
+    description: Refer to user who are register on this app
+    
   - name: notes
     description: Refer to notes that are created in the app
     
-  - name: lists
-    description: Refer to lists that are added in a note |
-                 deals.
   - name: labels
     description: Refer to labels that marked on the note
     
 paths:
-  /notes/:
+  /notes/users/{profileId}:
     get:
-      summary: get all notes created
-      description: returns the notes data that are created
+      summary: get all notes created by user
+      description: returns the notes data that are created by user provided profile ID
       tags:
         - notes
-        - lists
-        - labels
    
+      parameters:
+        - $ref: "#/parameters/ProfileIdInPath"
       responses:
         "200":
           description: success
           schema:
-            $ref: "#/definitions/Notes"
-          
+            allOf:
+                - $ref: "#/definitions/Notes"
+                - $ref: "#/definitions/lists"
+                - $ref: "#/definitions/labels"
         "404":
           description: notes are not retrieved
           schema:
@@ -55,10 +57,14 @@ paths:
           schema:
             $ref: "#/definitions/GeneralError"
             
+       
+  /notes/:
     post:
       summary: create a new note
       description: creates a new note in the app
       operationId: "addNote"
+      tags:
+        - notes
       produces:
         - application/json
       parameters: 
@@ -69,25 +75,26 @@ paths:
           required: true
           schema: 
             $ref: "#/definitions/Notes"
+        - $ref: "#/parameters/ProfileIdInPath"
       responses:
         "200":
           description: add note
           schema:
-            $ref: "#/definitions/Notes"
+            allOf:
+                - $ref: "#/definitions/Notes"
+                - $ref: "#/definitions/lists"
+                - $ref: "#/definitions/labels"
         default:
           description: unexpected error
           schema:
             $ref: "#/definitions/GeneralError"
-            
-          
+         
   /notes/{id}:
     get:
-      summary: get all notes created
-      description: returns the notes data that are created
+      summary: get note by note Id
+      description: returns the notes data with particular note ID
       tags:
         - notes
-        - lists
-        - labels
       consumes: 
         - application/json
       produces: 
@@ -98,7 +105,10 @@ paths:
         "200":
           description: success
           schema:
-            $ref: "#/definitions/Notes"
+            allOf:
+                - $ref: "#/definitions/Notes"
+                - $ref: "#/definitions/lists"
+                - $ref: "#/definitions/labels"
           
         "404":
           description: notes are not retrieved
@@ -125,13 +135,20 @@ paths:
       parameters:
         - $ref : "#/parameters/IdInPath"
       responses:
-        400:
+        "200":
+          description: success
+          schema:
+            allOf:
+                - $ref: "#/definitions/Notes"
+                - $ref: "#/definitions/lists"
+                - $ref: "#/definitions/labels"
+        "400":
           description: Invalid ID supplied
-        404:
+        "204":
           description: Note not found
           schema:
             $ref: "#/definitions/NotFoundError"
-        405:
+        "405":
           description: "Validation exception"
         default:
           description: unexpected errors
@@ -142,6 +159,8 @@ paths:
     delete:
       description: deletes a single note based on the ID supplied
       operationId: deleteNote
+      tags:
+        - notes
       parameters:
         - name: id
           in: path
@@ -153,7 +172,10 @@ paths:
         "204":
           description: note deleted
           schema:
-            $ref: '#/definitions/Notes'
+            allOf:
+                - $ref: "#/definitions/Notes"
+                - $ref: "#/definitions/lists"
+                - $ref: "#/definitions/labels"
         default:
           description: unexpected error
           schema:
@@ -166,14 +188,12 @@ paths:
       description: returns the labels data that are created
       tags:
         - labels
-    
-   
       responses:
         "200":
           description: success
           schema:
             $ref: "#/definitions/labels"
-          
+            
         "404":
           description: notes are not retrieved
           schema:
@@ -188,6 +208,8 @@ paths:
       summary: create a label for note
       description: creates a new label for the note
       operationId: "addLabel"
+      tags:
+        - labels
       produces:
         - application/json
       parameters: 
@@ -208,23 +230,20 @@ paths:
           schema:
             $ref: "#/definitions/GeneralError"
             
-  /notes/{id}/labels/: 
+  /labels/{id}:
     get:
-      summary: get label based on id
-      description: returns the label data that are matching with id supplied
+      summary: get label by label id
+      description: returns the label's data provided label ID
       tags:
-        - notes
-        - label
-        
+        - labels
       parameters:
         - $ref : "#/parameters/IdInPath"
-   
       responses:
         "200":
           description: success
           schema:
             $ref: "#/definitions/labels"
-          
+            
         "404":
           description: notes are not retrieved
           schema:
@@ -234,12 +253,11 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/GeneralError"
-            
-            
+    
     put:
       tags:
-      - notes
-      summary: "Update an existing note"
+      - labels
+      summary: "Update an existing label"
       description: ""
       operationId: "updateLabel"
       consumes:
@@ -258,7 +276,7 @@ paths:
         "400":
           description: Invalid ID supplied
         "204":
-          description: Note not found
+          description: Label not found
           schema:
             $ref: "#/definitions/NotFoundError"
         "405":
@@ -267,11 +285,13 @@ paths:
           description: unexpected errors
           schema:
             $ref: "#/definitions/GeneralError"
-            
+        
             
     delete:
       description: deletes a single label based on the ID supplied
       operationId: deleteLabel
+      tags:
+        - labels
       parameters:
         - name: id
           in: path
@@ -284,35 +304,27 @@ paths:
           description: label deleted
           schema:
             $ref: '#/definitions/labels'
-        default:
-          description: unexpected error
-          schema:
-            $ref: '#/definitions/GeneralError'
             
-  /notes/{id}/lists/:
+  /labels/users/{profileId}:
     get:
-      summary: get all lists created on the note
-      description: returns the lists data that are created on the note supplied with ID
+      summary: get all labels by user
+      description: returns the notes data that are created by user provided profile ID
       tags:
-        - notes
-        - lists
-        
-      consumes: 
-        - application/json
-      produces: 
-        - application/json
-        
-      parameters:
-        - $ref : "#/parameters/IdInPath"
+        - labels
    
+      parameters:
+        - $ref: "#/parameters/ProfileIdInPath"
       responses:
         "200":
           description: success
           schema:
-            $ref: "#/definitions/lists"
-          
+            allOf:
+                - $ref: "#/definitions/userProfile"
+                - $ref: "#/definitions/Notes"
+                - $ref: "#/definitions/lists"
+                - $ref: "#/definitions/labels"
         "404":
-          description: list are not retrieved
+          description: notes are not retrieved
           schema:
             $ref: "#/definitions/NotFoundError"
           
@@ -321,87 +333,86 @@ paths:
           schema:
             $ref: "#/definitions/GeneralError"
             
-    put:
+            
+  /users/{profileId}:
+    get:
+      summary: get user by user id
+      description: returns the user's data provided user ID
       tags:
-      - notes
-      summary: "Update an existing list"
-      description: ""
-      operationId: "updateList"
-      consumes:
-      - "application/json"
-      
-      produces:
-      - "application/json"
-      
+        - users
       parameters:
-        - $ref : "#/parameters/IdInPath"
+        - $ref : "#/parameters/ProfileIdInPath"
       responses:
         "200":
           description: success
           schema:
-            $ref: "#/definitions/lists"
-        "400":
-          description: Invalid ID supplied
-        "204":
-          description: Note not found
+            $ref: "#/definitions/userProfile"
+            
+        "404":
+          description: user details are not retrieved
           schema:
             $ref: "#/definitions/NotFoundError"
-        "405":
-          description: "Validation exception"
+          
         default:
-          description: unexpected errors
+          description: Error
           schema:
             $ref: "#/definitions/GeneralError"
-    
+            
+  /users/:
+    get:
+      summary: get all users who are registered
+      description: returns the user's data 
+      tags:
+        - users
+      parameters:
+        - $ref : "#/parameters/ProfileIdInPath"
+      responses:
+        "200":
+          description: success
+          schema:
+            $ref: "#/definitions/userProfile"
+            
+        "404":
+          description: users details are not retrieved
+          schema:
+            $ref: "#/definitions/NotFoundError"
+          
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/GeneralError"
+        
     post:
-      summary: create a list on the note with id supplied
-      description: creates a new label for the note
-      operationId: "addList"
+      summary: create an user when he/she registers
+      description: creates a new user when he/she register
+      operationId: "addUserl"
+      tags:
+        - users
       produces:
         - application/json
       parameters: 
-        - $ref : "#/parameters/IdInPath"
         - 
-          name: "label"
+          name: "user"
           in: "body"
-          description: "lable to add to the note"
+          description: "user to add to the note"
           required: true
           schema: 
-            $ref: "#/definitions/lists"
+            $ref: "#/definitions/userProfile"
       responses:
         "200":
-          description: add note
+          description: add user
           schema:
-            $ref: "#/definitions/lists"
+            $ref: "#/definitions/userProfile"
         default:
           description: unexpected error
           schema:
             $ref: "#/definitions/GeneralError"
-            
-    delete:
-      description: deletes a single list based on the ID supplied
-      operationId: deleteList
-      parameters:
-        - name: id
-          in: path
-          description: ID of list to delete
-          required: true
-          type: integer
-          format: int64
-      responses:
-        "204":
-          description: list deleted
-          schema:
-            $ref: '#/definitions/lists'
-        default:
-          description: unexpected error
-          schema:
-            $ref: '#/definitions/GeneralError'
-           
-            
-            
          
+      
     
+    
+  
+            
 definitions:
 # A general message schema in case of an error
   GeneralError:
@@ -488,6 +499,16 @@ definitions:
         type: string
       isChecked:
         type: boolean
+        
+  userProfile:
+    required:
+      - userId
+      - profileId
+    properties:
+      userId:
+        type: string
+      profileId:
+        type: string
 
 parameters:
   IdInPath:
@@ -500,6 +521,9 @@ parameters:
       in: path
       type: string
       required: true
-        
-        
-    
+      
+  ProfileIdInPath:
+      name: profileId
+      in: path
+      type: string
+      required: true
